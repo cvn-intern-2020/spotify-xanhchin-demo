@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const fetch = require('node-fetch');
+const Table = require('cli-table');
 
 const app = express();
 app.use(express.json());
@@ -53,9 +54,15 @@ app.get('/callback', async (req, res) => {
     .then((resp) => resp.json())
     .then((data) => data.items);
   console.log(`User has liked ${likedSongs.length} songs:`);
-  likedSongs.forEach((song) => {
-    console.log(`${song.track.name} - ${song.track.artists[0].name}`);
+  const songTable = new Table({
+    head: ['Song', 'Artist'],
+    colWidths: [30, 30],
   });
+  likedSongs.forEach((song) => {
+    songTable.push([song.track.name, song.track.artists[0].name]);
+  });
+  console.log(songTable.toString());
+  return res.send('Data retrieved successfully');
 });
 
 const PORT = process.env.PORT;
